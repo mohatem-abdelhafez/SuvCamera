@@ -1,0 +1,52 @@
+# ProWatch AI — Visual Monitoring Configuration
+# Copy .env.example to .env and set QWEN_API_KEY before running.
+
+camera:
+  source: 0            # 0 = default webcam | or an RTSP/HTTP URL string
+  width: 1280
+  height: 720
+
+sampling:
+  interval_seconds: 6  # How often a frame is sampled and sent for analysis
+  jpeg_quality: 82     # JPEG quality of the frame sent to the API (1-95)
+
+api:
+  model: "qwen-vl-plus"   # qwen-vl-plus | qwen-vl-max | qwen2-vl-72b-instruct
+  base_url: "https://dashscope.aliyuncs.com/compatible-mode/v1"
+  max_tokens: 300
+  timeout_seconds: 20
+
+monitoring:
+  # What the AI should watch for and how it should behave.
+  instructions: |
+    Watch this camera feed and report meaningful observations.
+
+    COMMENT when you notice:
+    - A person entering, leaving, or moving through the scene
+    - An object that was not previously present
+    - Unusual animal activity
+    - Any behavior worth noting for a security log
+
+    ALERT immediately for:
+    - Fire, smoke, or visible flames
+    - A physical altercation or aggressive behavior
+    - A person in apparent distress or need of help
+    - Forced entry or vandalism
+    - Any object that looks like a weapon
+
+    IGNORE when:
+    - The scene is empty and unchanged
+    - Only minor lighting shifts (clouds, shadows)
+    - Repetitive motion already reported in recent history
+
+  cooldown_seconds: 30       # Minimum seconds between COMMENT events
+  alert_cooldown_seconds: 8  # Minimum seconds between ALERT events
+  max_history: 5             # Recent non-ignore events included in each prompt
+
+events:
+  retention_hours: 48
+  db_path: "data/events.db"
+
+server:
+  host: "0.0.0.0"
+  port: 8000

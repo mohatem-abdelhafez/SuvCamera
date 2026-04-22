@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ProWatch AI</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- ── Header ── -->
+  <header>
+    <div class="brand">
+      <span class="brand-icon">◉</span>
+      <span class="brand-name">ProWatch <span class="brand-ai">AI</span></span>
+    </div>
+    <div class="header-center">
+      <span id="live-badge" class="badge badge-live">● LIVE</span>
+      <span id="status-badge" class="badge badge-idle">IDLE</span>
+    </div>
+    <div class="header-right">
+      <span id="event-counter" class="counter">0 events</span>
+    </div>
+  </header>
+
+  <!-- ── Main layout ── -->
+  <main>
+    <!-- Camera panel -->
+    <section class="panel panel-camera">
+      <div class="panel-title">
+        <span>Camera Feed</span>
+        <span id="camera-label" class="label">CAM 1</span>
+      </div>
+      <div class="feed-wrapper">
+        <img id="stream" src="/stream" alt="Camera stream" />
+        <div id="overlay-alert" class="overlay-alert hidden">
+          <span class="overlay-icon">⚠</span>
+          <span id="overlay-message"></span>
+        </div>
+      </div>
+      <div class="feed-footer">
+        <span id="last-analysis">Waiting for first analysis…</span>
+      </div>
+    </section>
+
+    <!-- Events panel -->
+    <section class="panel panel-events">
+      <div class="panel-title">
+        <span>Observations</span>
+        <button id="clear-btn" class="btn-clear" title="Clear display (does not delete from DB)">Clear</button>
+      </div>
+
+      <div id="empty-state" class="empty-state">
+        <div class="empty-icon">◎</div>
+        <p>No events yet. The AI will speak<br/>when something worth noting occurs.</p>
+      </div>
+
+      <ul id="event-list" class="event-list"></ul>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
