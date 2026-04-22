@@ -72,6 +72,35 @@ class Analyzer:
         raw = response.choices[0].message.content.strip()
         return self._parse(raw)
 
+    async def chat(self, frame_jpeg: bytes, message: str) -> str:
+        """Answer a free-form user question about the current camera frame."""
+        b64 = base64.b64encode(frame_jpeg).decode()
+        response = await self._client.chat.completions.create(
+            model=self._model,
+            max_tokens=600,
+            messages=[
+                {
+                    "role": "system",
+                    "content": (
+                        "You are a visual AI assistant connected to a live camera or video feed. "
+                        "Answer the user's question based solely on what is visible in the current frame. "
+                        "Be concise, descriptive, and direct. If something is unclear or not visible, say so."
+                    ),
+                },
+                {
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "image_url",
+                            "image_url": {"url": f"data:image/jpeg;base64,{b64}"},
+                        },
+                        {"type": "text", "text": message},
+                    ],
+                },
+            ],
+        )
+        return response.choices[0].message.content.strip()
+
     @staticmethod
     def _format_history(history: list[dict]) -> str:
         if not history:

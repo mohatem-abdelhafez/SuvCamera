@@ -3,20 +3,36 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ProWatch AI</title>
+  <title>Cognitive Camera</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+
   <!-- ── Header ── -->
   <header>
     <div class="brand">
-      <span class="brand-icon">◉</span>
-      <span class="brand-name">ProWatch <span class="brand-ai">AI</span></span>
+      <svg class="brand-svg" viewBox="0 0 120 96" width="36" height="29" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M118,48 C118,23 98,3 73,3 C63,3 53,6 45,12 L45,15 C55,9 64,7 73,7 C96,7 114,26 114,48 C114,70 96,89 73,89 C64,89 55,87 45,81 L45,84 C53,90 63,93 73,93 C98,93 118,73 118,48Z" fill="#f9996c" opacity="0.28"/>
+        <path d="M95,48 C95,30 81,16 63,14 C53,13 44,16 36,22 L36,25 C45,19 54,16 63,18 C79,20 91,32 91,48 C91,64 79,76 63,78 C54,80 45,77 36,71 L36,74 C44,80 53,83 63,82 C81,80 95,66 95,48Z" fill="#f9996c" opacity="0.6"/>
+        <path d="M72,48 C72,37 64,28 53,26 C44,25 35,28 27,35 L27,38 C35,31 44,29 53,30 C62,32 68,39 68,48 C68,57 62,64 53,66 C44,67 35,65 27,58 L27,61 C35,68 44,71 53,70 C64,68 72,59 72,48Z" fill="#f9996c"/>
+        <circle cx="27" cy="48" r="5" fill="#f9996c"/>
+      </svg>
+      <div class="brand-text">
+        <span class="brand-name">Cognitive <span class="brand-accent">Camera</span></span>
+        <span class="brand-sub">Visual AI Monitor</span>
+      </div>
     </div>
+
     <div class="header-center">
-      <span id="live-badge" class="badge badge-live">● LIVE</span>
+      <span id="live-badge" class="badge badge-live">
+        <span class="live-dot"></span>LIVE
+      </span>
       <span id="status-badge" class="badge badge-idle">IDLE</span>
     </div>
+
     <div class="header-right">
       <span id="event-counter" class="counter">0 events</span>
     </div>
@@ -24,39 +40,125 @@
 
   <!-- ── Main layout ── -->
   <main>
-    <!-- Camera panel -->
+
+    <!-- ── Camera panel ── -->
     <section class="panel panel-camera">
       <div class="panel-title">
-        <span>Camera Feed</span>
-        <span id="camera-label" class="label">CAM 1</span>
+        <div class="panel-title-left">
+          <span class="panel-label">Camera Feed</span>
+          <span id="camera-label" class="source-chip">CAM 0</span>
+        </div>
+        <div class="panel-controls">
+          <select id="camera-select" class="camera-select hidden" title="Switch camera"></select>
+          <button id="camera-toggle-btn" class="btn btn-danger" title="Stop camera">
+            <span class="btn-dot btn-dot-stop"></span>Stop
+          </button>
+          <button id="source-toggle-btn" class="btn btn-ghost" title="Upload video or switch back to camera">
+            <svg id="source-toggle-icon" width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 2v8M4 6l4-4 4 4M2 13h12"/></svg>
+            <span id="source-toggle-label">Upload Video</span>
+          </button>
+          <input type="file" id="video-upload" accept=".mp4,.avi,.mkv,.mov,.webm" hidden />
+        </div>
       </div>
+
       <div class="feed-wrapper">
         <img id="stream" src="/stream" alt="Camera stream" />
+        <div id="camera-off-overlay" class="camera-off-overlay hidden">
+          <div class="off-icon-wrap">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#f9996c" stroke-width="1.5" opacity="0.5"><rect x="2" y="6" width="15" height="12" rx="2"/><path d="M17 9l5-3v12l-5-3"/><line x1="12" y1="2" x2="12" y2="22" stroke="#ef4444" stroke-width="2"/></svg>
+          </div>
+          <span class="off-label">Camera stopped</span>
+          <button class="btn btn-success btn-sm" id="restart-camera-btn">Start Camera</button>
+        </div>
         <div id="overlay-alert" class="overlay-alert hidden">
-          <span class="overlay-icon">⚠</span>
+          <div class="overlay-alert-icon">⚠</div>
           <span id="overlay-message"></span>
         </div>
       </div>
+
       <div class="feed-footer">
         <span id="last-analysis">Waiting for first analysis…</span>
       </div>
     </section>
 
-    <!-- Events panel -->
-    <section class="panel panel-events">
-      <div class="panel-title">
-        <span>Observations</span>
-        <button id="clear-btn" class="btn-clear" title="Clear display (does not delete from DB)">Clear</button>
+    <!-- ── Right panel ── -->
+    <section class="panel panel-right">
+
+      <!-- Mode toggle header -->
+      <div class="mode-header">
+        <div class="mode-pill">
+          <button class="mode-pill-btn active" data-mode="proactive">
+            <svg width="11" height="11" viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="8" r="4"/><circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+            Proactive
+          </button>
+          <button class="mode-pill-btn" data-mode="chat">
+            <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 10a2 2 0 01-2 2H5l-3 3V4a2 2 0 012-2h8a2 2 0 012 2v6z"/></svg>
+            Chat
+          </button>
+        </div>
+        <button id="clear-btn" class="btn-icon-text" title="Clear events">
+          <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3l10 10M13 3L3 13"/></svg>
+          Clear
+        </button>
       </div>
 
-      <div id="empty-state" class="empty-state">
-        <div class="empty-icon">◎</div>
-        <p>No events yet. The AI will speak<br/>when something worth noting occurs.</p>
+      <!-- Proactive view -->
+      <div id="proactive-view" class="mode-view">
+        <div id="empty-state" class="empty-state">
+          <div class="empty-icon-wrap">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#f9996c" stroke-width="1" opacity="0.4"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </div>
+          <p class="empty-title">Watching…</p>
+          <p class="empty-body">The AI will post observations<br/>as events occur in the feed.</p>
+        </div>
+        <ul id="event-list" class="event-list"></ul>
       </div>
 
-      <ul id="event-list" class="event-list"></ul>
+      <!-- Chat view -->
+      <div id="chat-view" class="mode-view hidden">
+        <div id="chat-messages" class="chat-messages">
+          <div class="chat-welcome">
+            <div class="chat-welcome-icon">
+              <svg width="28" height="28" viewBox="0 0 120 96" xmlns="http://www.w3.org/2000/svg">
+                <path d="M118,48 C118,23 98,3 73,3 C63,3 53,6 45,12 L45,15 C55,9 64,7 73,7 C96,7 114,26 114,48 C114,70 96,89 73,89 C64,89 55,87 45,81 L45,84 C53,90 63,93 73,93 C98,93 118,73 118,48Z" fill="#f9996c" opacity="0.28"/>
+                <path d="M95,48 C95,30 81,16 63,14 C53,13 44,16 36,22 L36,25 C45,19 54,16 63,18 C79,20 91,32 91,48 C91,64 79,76 63,78 C54,80 45,77 36,71 L36,74 C44,80 53,83 63,82 C81,80 95,66 95,48Z" fill="#f9996c" opacity="0.6"/>
+                <path d="M72,48 C72,37 64,28 53,26 C44,25 35,28 27,35 L27,38 C35,31 44,29 53,30 C62,32 68,39 68,48 C68,57 62,64 53,66 C44,67 35,65 27,58 L27,61 C35,68 44,71 53,70 C64,68 72,59 72,48Z" fill="#f9996c"/>
+                <circle cx="27" cy="48" r="5" fill="#f9996c"/>
+              </svg>
+            </div>
+            <p class="chat-welcome-title">Ask the camera</p>
+            <p class="chat-welcome-body">Type a question about what's currently visible in the feed. The AI analyzes the live frame and responds.</p>
+            <div class="chat-suggestions">
+              <button class="suggestion-chip" data-q="What do you see in this frame?">What's in frame?</button>
+              <button class="suggestion-chip" data-q="Is there anything unusual or suspicious?">Anything suspicious?</button>
+              <button class="suggestion-chip" data-q="How many people are visible?">Count people</button>
+              <button class="suggestion-chip" data-q="Describe the lighting and environment.">Describe scene</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="chat-input-area">
+          <textarea id="chat-input" class="chat-input" placeholder="Ask about the current frame…" rows="1" spellcheck="false"></textarea>
+          <button id="chat-send" class="chat-send-btn" title="Send (Enter)">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          </button>
+        </div>
+      </div>
+
     </section>
   </main>
+
+  <!-- ── System Prompt ── -->
+  <section class="panel panel-prompt">
+    <div class="panel-title">
+      <div class="panel-title-left">
+        <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" opacity="0.6"><path d="M2 4h12M2 8h8M2 12h5"/></svg>
+        <span class="panel-label">Monitoring Instructions</span>
+      </div>
+      <button id="save-prompt-btn" class="btn btn-accent btn-sm">Save</button>
+    </div>
+    <textarea id="prompt-textarea" class="prompt-textarea" placeholder="Describe what the AI should watch for, comment on, and alert about…" spellcheck="false"></textarea>
+  </section>
 
   <script src="app.js"></script>
 </body>
